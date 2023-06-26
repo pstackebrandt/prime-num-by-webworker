@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Prime num by webworker</title>
+    <style> </style>
+    <script src="prime-worker.js" type="module" defer></script>
+    <script>
+        'use strict';
+
+
+        // run when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            // if user clicked #startNumberCheck button get number from #numberToCheck input and call checkNumber function
+            document.getElementById('startNumberCheck').addEventListener('click', function () {
+                let numberToCheck = document.getElementById('numberToCheck').value;
+                checkNumber(numberToCheck);
+            });
+        });
+
+        // print result to DOM
+        function printResult(result, numberToCheck) {
+            // create new DOM element
+            let newElement = document.createElement('div');
+
+            // add class to new DOM element
+            newElement.classList.add('prime');
+            // add text to new DOM element
+
+            if (result == true) {
+                newElement.innerText = numberToCheck + ' is a prime number';
+            } else {
+                newElement.innerText = numberToCheck + ' is not a prime number';
+            }
+            // append new DOM element to main element
+            document.querySelector('main').appendChild(newElement);
+        }
+
+        // check if number is prime number
+        function checkNumber(numberToCheck) {
+            // create new webworker
+            let worker = new Worker('prime-worker.js', { type: 'module' });
+            // send number to check to webworker
+            worker.postMessage(numberToCheck);
+            // listen for message from webworker
+            worker.onmessage = function (event) {
+                // print result to DOM
+                printResult(event.data, numberToCheck);
+            };
+        }
+    </script>
+</head>
+
+<body>
+    <h1>
+        Check number for prime number using webworker
+    </h1>
+    <details>
+        <summary>Task description</summary>
+        <p><em>Task 0.0</em></p>
+        <p>Schreibe ein Programm, das mithilfe von Webworkern beliebige Zahlen darauf überprüft, ob es Primzahlen sind.
+            Für jede Zahl soll ein DOM-Element angezeigt werden, in dem der aktuelle Status dargestellt wird.</p>
+    </details>
+    <main>
+        <h2>
+            Checked numbers
+        </h2>
+        <input type="number" id="numberToCheck" placeholder="Enter number to check">
+        <button id="startNumberCheck">Check</button>
+
+
+    </main>
+</body>
+
+</html>
